@@ -1,8 +1,9 @@
-from PIL import Image
 from themes.theme import Theme
-from image_processing.fen_to_image import FENToImage
 from chess import pgn 
+from utils.fen import render_chessboard
+
 import io
+import os
 
 class PGNToImage:
     """
@@ -52,7 +53,6 @@ class PGNToImage:
             output_dir (str): The directory to save the generated images.
             final_position_only (bool): If True, generate an image only for the final position.
         """
-        import os
         for file_name in os.listdir(folder_path):
             if file_name.endswith(".pgn"):
                 pgn_path = os.path.join(folder_path, file_name)
@@ -67,7 +67,9 @@ class PGNToImage:
             output_dir (str): The directory to save the generated images.
             final_position_only (bool): If True, generate an image only for the final position.
         """
-        import os
+        if game is None:
+            raise ValueError("The game object is invalid or could not be parsed from the PGN.")
+
         board = game.board()
         move_number = 0
 
@@ -75,36 +77,12 @@ class PGNToImage:
             for move in game.mainline_moves():
                 board.push(move)
             fen = board.fen()
-            output_file = os.path.join(output_dir, f"final_position.png")
-            self._render_from_fen(fen, output_file)
+            output_file = os.path.join(output_dir, "final_position.png")
+            render_chessboard(fen, self.theme, output_file)
         else:
             for move in game.mainline_moves():
                 board.push(move)
                 fen = board.fen()
                 move_number += 1
                 output_file = os.path.join(output_dir, f"move_{move_number}.png")
-                self._render_from_fen(fen, output_file)
-
-    def _render_from_fen(self, fen: str, output_file: str) -> None:
-        """
-        Render a chessboard image from a FEN string.
-
-        Args:
-            fen (str): The FEN string representing the chessboard state.
-            output_file (str): The file path to save the generated image.
-        """
-        board_image = Image.open(self.theme.board_image).convert("RGBA")
-        piece_positions = FENToImage._fen_to_positions(fen)
-
-        for square, piece in piece_positions.items():
-            if piece:
-                piece_image_path = self.theme.piece_images[piece]
-                piece_image = Image.open(piece_image_path).convert("RGBA")
-
-                x, y = self.theme.squares[square]["x"], self.theme.squares[square]["y"]
-                x -= piece_image.width // 2
-                y -= piece_image.height // 2
-
-                board_image.paste(piece_image, (x, y), piece_image)
-
-        board_image.save(output_file)
+                render_chessboard(fen, self.theme, output_file)
