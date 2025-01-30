@@ -29,7 +29,7 @@ class TestPGNToImage(unittest.TestCase):
         self.assertTrue(os.path.exists(path))
         os.remove(path)
 
-    # render_from_pgn_string WRONG STRING ERROR
+    # render_from_pgn_string INVALID STRING
     def test_render_from_pgn_string_error(self):
         """Test a standard rendering from an empty PGN string."""
         pgn_string = ""

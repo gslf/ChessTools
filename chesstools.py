@@ -1,7 +1,7 @@
 import os
 import sys
 from themes.theme import Theme
-from image_processing.fen_to_image import FENToImage
+from image_processing.fen_to_image import render_from_fen, render_from_fen_file
 from image_processing.pgn_to_image import PGNToImage
 
 def main_menu():
@@ -40,9 +40,8 @@ def generate_from_fen_string(theme):
     fen = input("Enter the FEN string: ").strip()
     output_file = input("Enter the output file path (e.g., output.png): ").strip()
 
-    generator = FENToImage(theme)
     try:
-        generator.render_from_fen(fen, output_file)
+        render_from_fen(fen, theme, output_file)
         print(f"Image successfully generated and saved to {output_file}")
     except Exception as e:
         print(f"Error generating image: {e}")
@@ -54,10 +53,8 @@ def generate_from_fen_file(theme):
     if not os.path.isfile(fen_file):
         print(f"File not found: {fen_file}")
         return
-
-    generator = FENToImage(theme)
     try:
-        generator.render_from_fen_file(fen_file, output_file)
+        render_from_fen_file(fen_file, theme, output_file)
         print(f"Image successfully generated and saved to {output_file}")
     except Exception as e:
         print(f"Error generating image: {e}")

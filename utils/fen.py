@@ -16,19 +16,42 @@ def fen_to_positions(fen: str) -> dict:
 
     Returns:
         dict: A dictionary with square names as keys and piece codes as values.
+
+    Raises:
+        ValueError: If the FEN string is not valid.
     """
-    positions = {}
+    if not fen or " " not in fen:
+        raise ValueError("Invalid FEN string: missing required fields")
+
     rows = fen.split()[0].split("/")
+    
+    if len(rows) != 8:
+        raise ValueError("Invalid FEN string: must contain exactly 8 rows")
+
+    positions = {}
+    
     for rank_index, row in enumerate(rows):
         file_index = 0
+        row_sum = 0  # Track the number of columns in the row
+        
         for char in row:
             if char.isdigit():
+                row_sum += int(char)
                 file_index += int(char)
-            else:
+            elif char.isalpha() and char in "prnbqkPRNBQK":
+                if file_index >= 8:
+                    raise ValueError(f"Invalid FEN string: too many pieces in row {8 - rank_index}")
                 square = chr(97 + file_index) + str(8 - rank_index)  # Convert file and rank to algebraic notation
                 piece = ("b" if char.islower() else "w") + char.lower()
                 positions[square] = piece
                 file_index += 1
+                row_sum += 1
+            else:
+                raise ValueError(f"Invalid FEN string: invalid character '{char}' in row {8 - rank_index}")
+
+        if row_sum != 8:
+            raise ValueError(f"Invalid FEN string: row {8 - rank_index} does not have exactly 8 columns")
+
     return positions
 
 def pgn_to_fen(pgn_string: str) -> Optional[str]:
