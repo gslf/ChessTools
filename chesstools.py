@@ -2,7 +2,7 @@ import os
 import sys
 from themes.theme import Theme
 from image_processing.fen_to_image import render_from_fen, render_from_fen_file
-from image_processing.pgn_to_image import PGNToImage
+from image_processing.pgn_to_image import render_from_pgn_string, render_from_pgn_file, render_from_pgn_folder
 
 def main_menu():
     theme = load_default_theme()
@@ -38,7 +38,7 @@ def main_menu():
 
 def generate_from_fen_string(theme):
     fen = input("Enter the FEN string: ").strip()
-    output_file = input("Enter the output file path (e.g., output.png): ").strip()
+    output_file = input("Enter the output file path (e.g., output): ").strip()
 
     try:
         render_from_fen(fen, theme, output_file)
@@ -48,7 +48,7 @@ def generate_from_fen_string(theme):
 
 def generate_from_fen_file(theme):
     fen_file = input("Enter the path to the FEN file: ").strip()
-    output_file = input("Enter the output file path (e.g., output.png): ").strip()
+    output_file = input("Enter the output file path (e.g., output): ").strip()
 
     if not os.path.isfile(fen_file):
         print(f"File not found: {fen_file}")
@@ -62,11 +62,11 @@ def generate_from_fen_file(theme):
 def generate_from_pgn_string(theme):
     pgn_string = input("Enter the PGN string: ").strip()
     output_dir = input("Enter the output directory: ").strip()
+    output_file = input("Enter the output filename: ").strip()
     final_position_only = input("Generate only the final position? (yes/no): ").strip().lower() == "yes"
 
-    generator = PGNToImage(theme)
     try:
-        generator.render_from_pgn_string(pgn_string, output_dir, final_position_only)
+        render_from_pgn_string(pgn_string, theme, output_dir, output_file, final_position_only)
         print(f"Images successfully generated and saved to {output_dir}")
     except Exception as e:
         print(f"Error generating images: {e}")
@@ -74,15 +74,15 @@ def generate_from_pgn_string(theme):
 def generate_from_pgn_file(theme):
     pgn_file = input("Enter the path to the PGN file: ").strip()
     output_dir = input("Enter the output directory: ").strip()
+    output_file = input("Enter the output filename: ").strip()
     final_position_only = input("Generate only the final position? (yes/no): ").strip().lower() == "yes"
 
     if not os.path.isfile(pgn_file):
         print(f"File not found: {pgn_file}")
         return
 
-    generator = PGNToImage(theme)
     try:
-        generator.render_from_pgn_file(pgn_file, output_dir, final_position_only)
+        render_from_pgn_file(pgn_file, theme, output_dir, output_file, final_position_only)
         print(f"Images successfully generated and saved to {output_dir}")
     except Exception as e:
         print(f"Error generating images: {e}")
@@ -96,15 +96,14 @@ def generate_from_pgn_folder(theme):
         print(f"Folder not found: {folder_path}")
         return
 
-    generator = PGNToImage(theme)
     try:
-        generator.render_from_pgn_folder(folder_path, output_dir, final_position_only)
+        render_from_pgn_folder(folder_path, theme, output_dir, final_position_only)
         print(f"Images successfully generated and saved to {output_dir}")
     except Exception as e:
         print(f"Error generating images: {e}")
 
 def load_default_theme():
-    theme_file = "themes/assets/standard/config.json"  # Path to your default theme JSON file
+    theme_file = "themes/assets/standard/config.json"  # Path to default theme JSON file
     try:
         return Theme.from_file(theme_file)
     except Exception as e:

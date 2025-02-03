@@ -15,7 +15,7 @@ class TestFENToImage(unittest.TestCase):
 
         self.theme = Theme.from_file("themes/assets/standard/config.json")
         self.fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        self.test_output = os.path.join(self.output_dir.name, "test.png")
+        self.test_output = os.path.join(self.output_dir.name, "test")
         
 
     def tearDown(self) -> None:
@@ -27,8 +27,8 @@ class TestFENToImage(unittest.TestCase):
         """Test a standard rendering from a PGN string."""
         render_from_fen(self.fen_string, self.theme, self.test_output)
 
-        self.assertTrue(os.path.exists(self.test_output))
-        os.remove(self.test_output)
+        self.assertTrue(os.path.exists(f"{self.test_output}.png"))
+        os.remove(f"{self.test_output}.png")
 
     # render_from_fen_string INVALID STRING
     def test_render_from_fen_string_invalid(self):
@@ -45,8 +45,8 @@ class TestFENToImage(unittest.TestCase):
 
         render_from_fen_file(tmp_fen_path, self.theme, self.test_output)
 
-        self.assertTrue(os.path.exists(self.test_output))
-        os.remove(self.test_output)
+        self.assertTrue(os.path.exists(f"{self.test_output}.png"))
+        os.remove(f"{self.test_output}.png")
 
     # render_from_fen_string INVALID FILE
     def test_render_from_fen_file_invalid(self):
